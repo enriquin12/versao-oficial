@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Página 2 - Frente</title>
+
+  <!-- PWA / iOS -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+
+  <style>
+    :root { --vh: 100vh; }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      -webkit-user-select: none;
+      user-select: none;
+      background: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      overflow: hidden;
+    }
+
+    .bg {
+      position: fixed;
+      inset: 0;
+      background-image: url('pagina2.jpeg');
+      background-repeat: no-repeat;
+      background-position: center top;
+      background-size: cover;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .ui {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .hotspot {
+      position: absolute;
+      background: rgba(255, 0, 0, 0);
+      border: none;
+      padding: 0;
+      margin: 0;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    #btn-back {
+      top: 2.6%;
+      left: 3.6%;
+      width: 9.2%;
+      height: 6.8%;
+      min-width: 44px;
+      min-height: 44px;
+      z-index: 10;
+    }
+
+    /* Removido o texto "Frente / Verso / QR Code" */
+    .segment-bar {
+      display: none;
+    }
+
+    .carousel-outer {
+      position: absolute;
+      top: 13%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      bottom: calc(env(safe-area-inset-bottom) + 68px);
+      overflow: hidden;
+      z-index: 5;
+      box-sizing: border-box;
+    }
+
+    .carousel-track {
+      display: flex;
+      height: 100%;
+      width: 100%;
+      transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+      will-change: transform;
+    }
+
+    .carousel-slide {
+      flex: 0 0 100%;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 12px;
+      box-sizing: border-box;
+    }
+
+    .card-img {
+      display: block;
+      width: auto;
+      height: auto;
+      max-width: min(86vw, 330px);
+      max-height: 100%;
+      border-radius: 12px;
+      box-shadow: 0 6px 28px rgba(0,0,0,0.22), 0 2px 6px rgba(0,0,0,0.12);
+      object-fit: contain;
+      background: #dde2ea;
+      margin: 0 auto;
+    }
+
+    .qr-slide-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      width: 100%;
+      max-width: 320px;
+      margin: 0 auto;
+    }
+
+    .qr-box {
+      background: #fff;
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.13);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .qr-image {
+      width: min(64vw, 180px);
+      height: min(64vw, 180px);
+      border-radius: 8px;
+      display: block;
+      object-fit: contain;
+      background: #eee;
+    }
+
+    .qr-timer-bar {
+      width: 100%;
+      height: 3px;
+      background: #e0e0e0;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .qr-timer-fill {
+      height: 100%;
+      background: #000;
+      border-radius: 2px;
+      transition: width 1s linear;
+    }
+
+    .qr-timer-text {
+      font-size: 14px;
+      color: #666;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .qr-info {
+      background: #e8f0ff;
+      border-radius: 12px;
+      padding: 11px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .qr-info-icon svg {
+      width: 18px;
+      height: 18px;
+      stroke: #1c4fd8;
+      fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      display: block;
+    }
+
+    .qr-info-text {
+      font-size: 13px;
+      color: #1c4fd8;
+      line-height: 1.4;
+    }
+
+    .auth-container {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: calc(env(safe-area-inset-bottom) + 18px);
+      z-index: 10;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 13px;
+      color: #000;
+      line-height: 1;
+      font-weight: 400;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    .auth-container .auth {
+      font-weight: 400;
+      font-size: 13px;
+      pointer-events: none;
+    }
+
+    @media (max-width: 360px) {
+      #btn-back { top: 3.2%; left: 4.2%; width: 11%; height: 7.6%; }
+      .auth-container { font-size: 12px; bottom: calc(env(safe-area-inset-bottom) + 14px); }
+      .card-img { max-width: 82vw; }
+      .qr-image { width: min(58vw, 165px); height: min(58vw, 165px); }
+    }
+
+    @media (min-width: 900px) {
+      #btn-back { min-width: 56px; min-height: 56px; }
+      .card-img { max-width: 310px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg" aria-hidden="true"></div>
+
+  <div class="ui" role="main" aria-label="Carteirinha">
+    <button id="btn-back" class="hotspot" aria-label="Voltar"></button>
+
+    <div class="segment-bar" id="segment-bar" aria-hidden="true"></div>
+
+    <div class="carousel-outer" id="carousel-outer">
+      <div class="carousel-track" id="carousel-track">
+
+        <div class="carousel-slide">
+          <img class="card-img" src="frente.jpeg" alt="Frente da carteirinha" draggable="false" />
+        </div>
+
+        <div class="carousel-slide">
+          <img class="card-img" src="verso.jpeg" alt="Verso da carteirinha" draggable="false" />
+        </div>
+
+        <div class="carousel-slide">
+          <div class="qr-slide-inner">
+            <div class="qr-box">
+              <img class="qr-image" src="qrcode.jpeg" alt="QR Code" draggable="false" />
+              <div class="qr-timer-bar">
+                <div class="qr-timer-fill" id="qr-fill" style="width:100%"></div>
+              </div>
+              <div class="qr-timer-text" id="qr-timer">00 : 30</div>
+            </div>
+            <div class="qr-info">
+              <div class="qr-info-icon">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              </div>
+              <div class="qr-info-text">Utilize esse QR Code para validar os dados da carteira.</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="auth-container" role="status" aria-live="polite" aria-atomic="true">
+      <span>Última atualização em:</span>
+      <span id="auth-timestamp" class="auth">carregando...</span>
+    </div>
+
+  </div>
+
+  <script>
+    function setVh() {
+      document.documentElement.style.setProperty(
+        '--vh', (window.innerHeight || document.documentElement.clientHeight) + 'px'
+      );
+    }
+    setVh();
+    window.addEventListener('resize', setVh);
+
+    function two(n) { return n < 10 ? '0' + n : String(n); }
+    function buildTimestamp(date) {
+      return `${two(date.getDate())}/${two(date.getMonth()+1)}/${String(date.getFullYear()).slice(-2)} - ${two(date.getHours())}:${two(date.getMinutes())}`;
+    }
+    function setAuthTimestamp() {
+      const el = document.getElementById('auth-timestamp');
+      if (el) el.textContent = buildTimestamp(new Date());
+    }
+
+    const track = document.getElementById('carousel-track');
+    let current = 0;
+    const N = 3;
+
+    function goTo(index, animate) {
+      if (animate === false) track.style.transition = 'none';
+      else track.style.transition = 'transform 0.32s cubic-bezier(0.4,0,0.2,1)';
+
+      current = Math.max(0, Math.min(N - 1, index));
+      track.style.transform = `translateX(-${current * 100}%)`;
+      if (current === 2) startQrTimer();
+    }
+
+    let tx = null, ty = null, dragging = false;
+    const outer = document.getElementById('carousel-outer');
+
+    outer.addEventListener('touchstart', e => {
+      tx = e.touches[0].clientX;
+      ty = e.touches[0].clientY;
+      dragging = false;
+    }, { passive: true });
+
+    outer.addEventListener('touchmove', e => {
+      if (tx === null) return;
+      const dx = e.touches[0].clientX - tx;
+      const dy = e.touches[0].clientY - ty;
+      if (!dragging && Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 8) dragging = true;
+    }, { passive: true });
+
+    outer.addEventListener('touchend', e => {
+      if (!dragging || tx === null) { tx = null; return; }
+      const dx = e.changedTouches[0].clientX - tx;
+      if (dx < -50) goTo(current + 1);
+      else if (dx > 50) goTo(current - 1);
+      tx = null; dragging = false;
+    }, { passive: true });
+
+    let qrInterval = null;
+    let qrSeconds = 30;
+
+    function startQrTimer() {
+      if (qrInterval) return;
+      qrSeconds = 30;
+      updateQrDisplay();
+      qrInterval = setInterval(() => {
+        qrSeconds--;
+        if (qrSeconds < 0) qrSeconds = 30;
+        updateQrDisplay();
+      }, 1000);
+    }
+
+    function updateQrDisplay() {
+      const fill = document.getElementById('qr-fill');
+      const timer = document.getElementById('qr-timer');
+      if (fill) fill.style.width = (qrSeconds / 30 * 100) + '%';
+      if (timer) timer.textContent = `00 : ${two(qrSeconds)}`;
+    }
+
+    document.getElementById('btn-back').addEventListener('click', function(e) {
+      e.preventDefault();
+      if (qrInterval) clearInterval(qrInterval);
+      location.assign('index.html');
+    }, { passive: false });
+
+    window.addEventListener('load', function() {
+      setAuthTimestamp();
+      goTo(0, false);
+    });
+
+    (function() {
+      const s = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+      console.info('Standalone?', s);
+    })();
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    }
+  </script>
+</body>
+</html>
